@@ -1,3 +1,12 @@
-program juego {
+import wollok.game.*
+import tp.*
 
+
+program juego {
+    game.title("Shadow Mantle")
+    game.height(1)
+    game.width(1)
+    game.cellSize(200)
+    game.start()
+    game.addVisual(player)
 }
