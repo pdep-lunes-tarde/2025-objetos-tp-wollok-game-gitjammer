@@ -1,26 +1,7 @@
-import wollok.game.*
-import tp.*
+import juegoShadowMantle.*
 
 
 program juego {
-    // Settings del juego van acá
-    game.title("Shadow Mantle")
-    game.height(15)
-    game.width(15)
-    game.cellSize(200)
+    shadowMantle.iniciarJuego()
 
-
-    game.start()
-    const player = new Player()
-    player.cambiarHP(3) // Seteamos la salud del jugador
-    game.addVisual(player)
-
-    // Movimeinto del jugador
-    keyboard.w().onPressDo{player.mover("arriba")}
-    keyboard.s().onPressDo{player.mover("abajo")}
-    keyboard.d().onPressDo{player.mover("derecha")}
-    keyboard.a().onPressDo{player.mover("izquierda")}
-
-    // Debug
-    keyboard.space().onPressDo{ game.say(player, player.direccion())}
 }

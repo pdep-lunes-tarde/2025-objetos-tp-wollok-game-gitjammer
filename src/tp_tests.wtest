@@ -1,4 +1,4 @@
-import tp.*
+import shadowMantle.*
 
 test "Test de prueba" {
 	assert.equals(4, 2 + 2)
