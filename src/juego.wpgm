@@ -11,6 +11,8 @@ program juego {
 
 
     game.start()
+    const player = new Player()
+    player.cambiarHP(3) // Seteamos la salud del jugador
     game.addVisual(player)
 
     // Movimeinto del jugador
