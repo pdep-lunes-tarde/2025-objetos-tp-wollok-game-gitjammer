@@ -5,6 +5,9 @@ import wollok.game.*
 // CLASE DE CharacterBody2D. DE ESTA HEREDAN EL JUGADOR Y LOS ENEMIGOS
 
 class CharacterBody2D {
+    var image = "goblinplaceholder.png"
+    method image() = image
+    method image(newImage) {image = newImage}
     method soyElJugador() { return false}
     // Salud
     var hp = 1
@@ -46,7 +49,7 @@ class CharacterBody2D {
 class Player inherits CharacterBody2D{
     override method soyElJugador() {return true}
     // Imagen
-    method image() = "playerplaceholderRESIZE.png"
+    override method image() = "playerFront1.png"
     // Puntaje
     var puntaje = 0
     method puntaje() {return puntaje} 
@@ -57,7 +60,7 @@ class Player inherits CharacterBody2D{
 // Enemigo.
 
 class Enemy inherits CharacterBody2D{
-    method image() = "goblinplaceholder.png"
+    override method image() = "goblinplaceholder.png"
     method interactuar(entidad){
         if (entidad.soyElJugador()){
             entidad.tomarDaño()
