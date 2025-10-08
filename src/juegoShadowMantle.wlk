@@ -4,12 +4,10 @@ import wollok.game.*
 object shadowMantle{
     // Configuración general
     const title = "Shadow Mantle"
-    const cuadrado = 15
-    method ancho(){ return cuadrado }
-    method alto() { return cuadrado }
+    const tamano = 15
+    method ancho(){ return tamano }
+    method alto() { return tamano }
 
-
-    // Configuración al iniciar el juego.
 
     method configuracion(){
         game.width(self.ancho())
@@ -24,6 +22,12 @@ object shadowMantle{
         player.cambiarHP(maxHP)
         game.addVisual(player)
         game.showAttributes(player)
+
+        // Barra de puntaje
+        game.onTick(1000,"sumarpuntaje", {player.sumarPuntaje(10)})
+        game.onTick(1000,"actualizarpuntaje", {puntaje.puntos(player.puntaje())})
+        game.addVisual(puntaje)
+
 
         // Enemigo de prueba
         const enemigo = new Enemy()

@@ -45,6 +45,7 @@ class CharacterBody2D {
     }
 }
 
+
 // Jugador.
 class Player inherits CharacterBody2D{
     override method soyElJugador() {return true}
@@ -52,10 +53,23 @@ class Player inherits CharacterBody2D{
     override method image() = "playerFront1.png"
     // Puntaje
     var puntaje = 0
-    method puntaje() {return puntaje} 
-    method cambiarPuntaje(cantidad) { puntaje = puntaje + cantidad} // Si quisiesemos restar puntaje al ser golpeados, deberíamos poner una cantidad negativa.
+    method puntaje() {return puntaje}
+    method setearPuntaje(nuevoPuntaje) {puntaje = nuevoPuntaje}
+    method sumarPuntaje(cantidad) { puntaje = puntaje + cantidad} // Si quisiesemos restar puntaje al ser golpeados, deberíamos poner una cantidad negativa.
 }
 
+// Barra de puntaje
+object puntaje {
+     var property position = game.at(0,14)
+     method position(nuevaPosicion) { position = nuevaPosicion}
+     var puntos = 0
+     method puntos(nuevoPuntaje) {
+        puntos = nuevoPuntaje
+     }
+     method text() = "Puntaje: " + puntos.toString()
+     method interactuar() {}
+     method textColor() = "00000000"
+}
 
 // Enemigo.
 
@@ -65,6 +79,12 @@ class Enemy inherits CharacterBody2D{
         if (entidad.soyElJugador()){
             entidad.tomarDaño()
             entidad.position(game.center())
+            entidad.sumarPuntaje(-100)
+            if (entidad.puntaje() -100 > 0) { entidad.puntaje(0) }
         }
     }
+}
+
+class Zombie inherits Enemy{
+
 }
