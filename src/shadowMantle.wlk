@@ -10,13 +10,12 @@ class CharacterBody2D {
     method image(newImage) {image = newImage}
     method soyElJugador() { return false}
     // Salud
-    var hp = 1
-    method hp() {return hp}
+    var property hp = 1
     method cambiarHP(cantidad) { hp = hp + cantidad}
     // Posición y Dirección
     var property position = game.center() // por default es el centro. ESTO SE TIENE QUE CAMBIAR SI VAMOS A HACER ENEMIGOS, PARA QUE NO APAREZCAN EN EL CENTRO.
     method position(nuevaPosicion) {position = nuevaPosicion}
-    var direccion = "null"
+    var direccion = "abajo"
     method direccion() {return direccion}
     method nuevaDireccion(nuevaDir) { direccion = nuevaDir}
     // Movimiento
@@ -40,8 +39,8 @@ class CharacterBody2D {
         if (hp -1 == 0){game.removeVisual(self)}
     }
     method tomarDaño() {
-      self.cambiarHP(-1)
       self.morir()
+      self.cambiarHP(-1)
     }
 }
 
@@ -52,9 +51,7 @@ class Player inherits CharacterBody2D{
     // Imagen
     override method image() = "playerFront1.png"
     // Puntaje
-    var puntaje = 0
-    method puntaje() {return puntaje}
-    method setearPuntaje(nuevoPuntaje) {puntaje = nuevoPuntaje}
+    var property puntaje = 0
     method sumarPuntaje(cantidad) { puntaje = puntaje + cantidad} // Si quisiesemos restar puntaje al ser golpeados, deberíamos poner una cantidad negativa.
 }
 
@@ -86,5 +83,29 @@ class Enemy inherits CharacterBody2D{
 }
 
 class Zombie inherits Enemy{
-
+    var property direccionDelJugador = "abajo"
+    method obtenerDireccionDelJugador(player){
+        var diferenciaEnX = player.position().x() - self.position().x()
+        var diferenciaEnY = player.position().y() - self.position().y()
+        if (diferenciaEnX >= 0 && diferenciaEnY <= 0){ // Caso 1. Abajo a la derecha
+            if (diferenciaEnX < diferenciaEnY.abs()){ self.direccionDelJugador("abajo") }
+            else { self.direccionDelJugador("derecha")}
+        }
+        if (diferenciaEnX <= 0 && diferenciaEnY <= 0) { // Caso 2. Abajo a la izquierda
+            if (diferenciaEnX.abs() < diferenciaEnY.abs()) { self.direccionDelJugador("abajo")}
+            else { self.direccionDelJugador("izquierda")}
+        }
+        if (diferenciaEnX >= 0 && diferenciaEnY > 0){ // Caso 3. Arriba a la derecha{
+            if (diferenciaEnX < diferenciaEnY){ self.direccionDelJugador("arriba")}
+            else {self.direccionDelJugador("derecha")}
+        }
+        if (diferenciaEnX <= 0 && diferenciaEnY > 0){ // Caso 4. Arriba a la izquierda
+            if (diferenciaEnX < diferenciaEnY.abs()) { self.direccionDelJugador("arriba")}
+            else {self.direccionDelJugador("izquierda")}
+        }
+    }
+    method moverseAlJugador(player){
+        self.obtenerDireccionDelJugador(player)
+        self.mover(direccionDelJugador)
+    }
 }

@@ -19,25 +19,25 @@ object shadowMantle{
         // Jugador
         const maxHP = 3
         const player = new Player()
-        player.cambiarHP(maxHP)
+        player.hp(maxHP)
         game.addVisual(player)
         game.showAttributes(player)
 
         // Barra de puntaje
         game.onTick(1000,"sumarpuntaje", {player.sumarPuntaje(10)})
-        game.onTick(1000,"actualizarpuntaje", {puntaje.puntos(player.puntaje())})
+        game.onTick(100,"actualizarpuntaje", {puntaje.puntos(player.puntaje())})
         game.addVisual(puntaje)
 
 
         // Enemigo de prueba
-        const enemigo = new Enemy()
-        enemigo.position(game.origin())
+        const enemigo = new Zombie()
+        enemigo.position(game.at(0,0))
         game.addVisual(enemigo)
 
         // Input Handling
 
         keyboard.w().onPressDo{player.mover("arriba")}
-
+        
         keyboard.s().onPressDo{player.mover("abajo")}
 
         keyboard.d().onPressDo{player.mover("derecha")}
@@ -46,6 +46,11 @@ object shadowMantle{
 
         // Collision Handling
         game.onCollideDo(player, {otro => otro.interactuar(player)})
+
+        // AI Handling
+        game.onTick(500, "moverzombie", {enemigo.moverseAlJugador(player)})
+        game.onTick(1000, "debug", {game.say(enemigo, enemigo.direccionDelJugador())})
+        game.onTick(1000, "debug2", {game.say(player, "HP: " + player.hp().toString())})
     }
 
 
