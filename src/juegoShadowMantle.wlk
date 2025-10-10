@@ -20,6 +20,7 @@ object shadowMantle{
         const maxHP = 3
         const player = new Player()
         player.hp(maxHP)
+        player.position(game.center())
         game.addVisual(player)
         game.showAttributes(player)
 
@@ -44,8 +45,10 @@ object shadowMantle{
 
         keyboard.a().onPressDo{player.mover("izquierda")}
 
+        keyboard.space().onPressDo{player.atacar()}
+
         // Collision Handling
-        game.onCollideDo(player, {otro => otro.interactuar(player)})
+        game.whenCollideDo(player, {otro => otro.interactuar(player)})
 
         // AI Handling
         game.onTick(500, "moverzombie", {enemigo.moverseAlJugador(player)})

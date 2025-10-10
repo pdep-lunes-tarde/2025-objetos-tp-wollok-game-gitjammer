@@ -2,22 +2,11 @@ import wollok.game.*
 
 // NOTA. TODOS LOS SPRITES SE HACEN INICIALMENTE EN 16X16, LUEGO SE REESCALAN A 200X200
 
-// CLASE DE CharacterBody2D. DE ESTA HEREDAN EL JUGADOR Y LOS ENEMIGOS
 
-class CharacterBody2D {
-    var image = "goblinplaceholder.png"
-    method image() = image
-    method image(newImage) {image = newImage}
-    method soyElJugador() { return false}
-    // Salud
-    var property hp = 1
-    method cambiarHP(cantidad) { hp = hp + cantidad}
-    // Posición y Dirección
-    var property position = game.center() // por default es el centro. ESTO SE TIENE QUE CAMBIAR SI VAMOS A HACER ENEMIGOS, PARA QUE NO APAREZCAN EN EL CENTRO.
-    method position(nuevaPosicion) {position = nuevaPosicion}
-    var direccion = "abajo"
-    method direccion() {return direccion}
-    method nuevaDireccion(nuevaDir) { direccion = nuevaDir}
+class Node2D {
+    var property position = game.origin() // por default es el oirgen de coordenadas. ESTO SE TIENE QUE CAMBIAR SI VAMOS A HACER ENEMIGOS.
+    // Dirección
+    var property direccion = "abajo"
     // Movimiento
     method mover(direccionMovimiento) {
         if (direccionMovimiento == "arriba") {
@@ -32,9 +21,20 @@ class CharacterBody2D {
         if (direccionMovimiento == "abajo") {
             self.position ( position.down(1) )
         }
-        self.nuevaDireccion(direccionMovimiento)
+        self.direccion(direccionMovimiento)
         }
     // Daño
+}
+// CLASE DE CharacterBody2D. DE ESTA HEREDAN EL JUGADOR Y LOS ENEMIGOS
+class CharacterBody2D inherits Node2D{
+    var image = "goblinplaceholder.png"
+    method image() = image
+    method image(newImage) {image = newImage}
+    method soyElJugador() { return false}
+    // Salud
+    var property hp = 1
+    method cambiarHP(cantidad) { hp = hp + cantidad}
+
     method morir() {
         if (hp -1 == 0){game.removeVisual(self)}
     }
@@ -53,8 +53,23 @@ class Player inherits CharacterBody2D{
     // Puntaje
     var property puntaje = 0
     method sumarPuntaje(cantidad) { puntaje = puntaje + cantidad} // Si quisiesemos restar puntaje al ser golpeados, deberíamos poner una cantidad negativa.
+    // Ataque
+    method atacar() {
+        var ataque = new Attack()
+        ataque.position(self.position())
+        ataque.mover(self.direccion())
+        game.addVisual(ataque)
+        game.onCollideDo(ataque, { otro => otro.serAtacado(ataque) })
+        game.schedule(ataque.duracion(), {game.removeVisual(ataque)})
+    }
 }
 
+
+class Attack inherits Node2D{
+    method image() = "ataque.png"
+    var property daño = 1
+    var property duracion = 500 // Duración en milisegundos
+}
 // Barra de puntaje
 object puntaje {
      var property position = game.at(0,14)
@@ -79,6 +94,9 @@ class Enemy inherits CharacterBody2D{
             entidad.sumarPuntaje(-100)
             if (entidad.puntaje() -100 > 0) { entidad.puntaje(0) }
         }
+    }
+    method serAtacado(ataque) {
+      self.tomarDaño()
     }
 }
 
