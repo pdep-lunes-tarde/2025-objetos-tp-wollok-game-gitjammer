@@ -1,6 +1,6 @@
 # Grupo
 
-Nombre: **COMPLETAR ACA**
+Nombre: Gitjammer
 
 Integrantes: **COMPLETAR ACA**
 
@@ -40,8 +40,9 @@ De esa entrega vamos a ayudarles a decidir que agregar para la siguiente entrega
 
 En esta entrega se evaluará el uso de objetos en el tp. Debe haber presente al menos una persona del grupo ese día para la corrección, caso contrario se considera no entregado.
 
-# Juego: NOMBRE
+# Juego: Shadow Mantle
 
 DESCRIPCION
 
 CONTROLES
+
