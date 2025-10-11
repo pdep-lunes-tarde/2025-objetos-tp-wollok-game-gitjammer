@@ -44,9 +44,8 @@ class CharacterBody2D inherits Node2D{
     }
 }
 
-
 // Jugador.
-class Player inherits CharacterBody2D{
+object player inherits CharacterBody2D{
     override method soyElJugador() {return true}
     // Imagen
     override method image() = "playerFront1.png"
@@ -84,7 +83,6 @@ object puntaje {
 }
 
 // Enemigo.
-
 class Enemy inherits CharacterBody2D{
     override method image() = "goblinplaceholder.png"
     method interactuar(entidad){
@@ -97,6 +95,7 @@ class Enemy inherits CharacterBody2D{
     }
     method serAtacado(ataque) {
       self.tomarDaño()
+      gameMaster.spawnCount(gameMaster.spawnCount() - 1) // Decrementa el contador de enemigos vivos al morir uno
     }
 }
 
@@ -122,8 +121,56 @@ class Zombie inherits Enemy{
             else {self.direccionDelJugador("izquierda")}
         }
     }
-    method moverseAlJugador(player){
+    method moverse(player){
         self.obtenerDireccionDelJugador(player)
         self.mover(direccionDelJugador)
     }
+    method inicializar(player){
+        game.onTick(500, "moverzombie", {self.moverse(player)})
+        game.whenCollideDo(player, {otro => otro.interactuar(player)})
+    }
+}
+
+
+
+
+// Juego
+object gameMaster{
+    var property spawnCount = 0
+    const diccionarioEnemigos = new Dictionary()
+    method generarDiccionario() {
+      diccionarioEnemigos.put(1,"zombie")
+      diccionarioEnemigos.put(2,"esqueleto")
+      diccionarioEnemigos.put(3,"goblin")
+    }
+    method enemigoAleatorio() {
+       var max = 1 // syncear con la cantidad de enemigos indexados (y que realmente existan)
+       return diccionarioEnemigos.get(1.randomUpTo(max))
+    }
+    method randomSpawn(){
+        var enemigoASpawnear = self.enemigoAleatorio()
+        if (enemigoASpawnear == "zombie") {
+            const zombie = new Zombie()
+            const randX = 0.randomUpTo(14)
+            const randY = 0.randomUpTo(14)
+            zombie.position(game.at(randX, randY))
+            game.addVisual(zombie)
+            zombie.inicializar(player)
+        }
+        self.spawnCount(self.spawnCount()+1)
+    }
+    method iniciar(){
+        game.onTick(1000, "spawn", {self.randomSpawn()})
+        game.onTick(1000, "revisarSpawns", {self.revisarSpawns()})
+    }
+    method revisarSpawns() {
+        if (self.spawnCount() > 5) {
+            game.removeTickEvent("spawn")
+        if (self.spawnCount() == 0){ // Esto no estaría funcionando. Revisar por qué. A lo mejor el spawnCount no se está reduciendo correctamente...
+            self.iniciar()
+        }
+        }
+    }
+
+
 }
