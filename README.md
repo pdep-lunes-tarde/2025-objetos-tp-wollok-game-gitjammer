@@ -46,7 +46,10 @@ DESCRIPCION
 
 
 CONTROLES
+
 Movimiento: W A S D 
+
 Ataque: Space
+
 
 
