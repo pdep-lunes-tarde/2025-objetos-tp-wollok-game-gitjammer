@@ -1,6 +1,6 @@
 # Grupo
 
-Nombre: **COMPLETAR ACA**
+Nombre: **GitJammer**
 
 Integrantes: **COMPLETAR ACA**
 
@@ -45,3 +45,4 @@ En esta entrega se evaluará el uso de objetos en el tp. Debe haber presente al 
 DESCRIPCION
 
 CONTROLES
+
