@@ -2,7 +2,7 @@
 
 Nombre: **GitJammer**
 
-Integrantes: **COMPLETAR ACA**
+Integrantes: **Juan Manuel Bravo, Nicolás Mustafa, Matías Maccaroni, Hernán Muñiz**
 
 # Consigna TP Integrador
 
@@ -52,6 +52,7 @@ CONTROLES
 Movimiento: W A S D 
 
 Ataque: Space
+
 
 
 
