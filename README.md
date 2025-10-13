@@ -44,12 +44,15 @@ En esta entrega se evaluará el uso de objetos en el tp. Debe haber presente al 
 
 DESCRIPCION
 
+Juego 2d inspirado en Zelda, el objetivo es matar a los enemigos que vayan apareciendo atacando con la barra espaciadora, al ser atacado 3 veces se termina el juego.
+
 
 CONTROLES
 
 Movimiento: W A S D 
 
 Ataque: Space
+
 
 
 
