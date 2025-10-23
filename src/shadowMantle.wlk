@@ -100,6 +100,7 @@ class Enemy inherits CharacterBody2D{
 }
 
 class Zombie inherits Enemy{
+    override method image() = "Zombie.png"
     var property direccionDelJugador = "abajo"
     method obtenerDireccionDelJugador(player){
         var diferenciaEnX = player.position().x() - self.position().x()
@@ -121,6 +122,28 @@ class Zombie inherits Enemy{
             else {self.direccionDelJugador("izquierda")}
         }
     }
+    method seleccionarPosicion(rand1){
+        if (rand1 == 1){ //Borde inferior
+        const yCoor = 0
+        const xCoor = 0.randomUpTo(14)
+        self.position(game.at(xCoor, yCoor))
+        }
+        else {if (rand1 == 2){ //Borde superior
+        const yCoor = 14
+        const xCoor = 0.randomUpTo(14)
+        self.position(game.at(xCoor, yCoor))
+        }
+        else {if (rand1 == 3){ //Borde izquierdo
+        const yCoor = 0.randomUpTo(14)
+        const xCoor = 0
+        self.position(game.at(xCoor, yCoor))
+        }
+        else {if(rand1 == 4){ //Borde derecho
+        const yCoor = 0.randomUpTo(14)
+        const xCoor = 14
+        self.position(game.at(xCoor, yCoor))
+        }}}}
+    }
     method moverse(player){
         self.obtenerDireccionDelJugador(player)
         self.mover(direccionDelJugador)
@@ -130,8 +153,6 @@ class Zombie inherits Enemy{
         game.whenCollideDo(player, {otro => otro.interactuar(player)})
     }
 }
-
-
 
 
 // Juego
@@ -144,18 +165,16 @@ object gameMaster{
       diccionarioEnemigos.put(3,"goblin")
     }
     method enemigoAleatorio() {
-       var max = 1 // syncear con la cantidad de enemigos indexados (y que realmente existan)
+       const max = 1 // syncear con la cantidad de enemigos indexados (y que realmente existan)
        return diccionarioEnemigos.get(1.randomUpTo(max))
     }
     method randomSpawn(){
-        var enemigoASpawnear = self.enemigoAleatorio()
+        const enemigoASpawnear = self.enemigoAleatorio()
         if (enemigoASpawnear == "zombie") {
             const zombie = new Zombie()
-            const randX = 0.randomUpTo(14)
-            const randY = 0.randomUpTo(14)
-            zombie.position(game.at(randX, randY))
-            game.addVisual(zombie)
+            zombie.seleccionarPosicion([1,2,3,4].anyOne())
             zombie.inicializar(player)
+            game.addVisual(zombie)
         }
         self.spawnCount(self.spawnCount()+1)
     }
