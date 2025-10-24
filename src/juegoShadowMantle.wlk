@@ -29,7 +29,6 @@ object shadowMantle{
         game.addVisual(puntaje)
 
         // gameMaster
-        gameMaster.generarDiccionario()
         gameMaster.iniciar()
 
         // Input Handling
