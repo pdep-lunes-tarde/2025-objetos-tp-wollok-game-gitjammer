@@ -49,7 +49,7 @@ class CharacterBody2D inherits Node2D{
 object player inherits CharacterBody2D{
     override method soyElJugador() {return true}
     // Imagen
-    override method image() = "playerplaceholder.png"
+    override method image() = "playerFront1.png"
     // Puntaje
     var property puntaje = 0
     method sumarPuntaje(cantidad) { puntaje = puntaje + cantidad} // Si quisiesemos restar puntaje al ser golpeados, deberíamos poner una cantidad negativa.
