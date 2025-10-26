@@ -5,14 +5,14 @@ object shadowMantle{
     // Configuración general
     const title = "Shadow Mantle"
     const tamano = 15
-    method ancho(){ return tamano }
+    method ancho() { return tamano }
     method alto() { return tamano }
 
 
     method configuracion(){
         game.width(self.ancho())
         game.height(self.alto())
-        game.cellSize(200)
+        game.cellSize(64)
         game.title(title)
         
 
@@ -23,15 +23,16 @@ object shadowMantle{
         game.addVisual(player)
         game.showAttributes(player)
 
-        // Barra de puntaje
-        game.onTick(1000,"sumarpuntaje", {player.sumarPuntaje(10)})
-        game.onTick(100,"actualizarpuntaje", {puntaje.puntos(player.puntaje())})
+        
+        // game.onTick(1000,"sumarpuntaje", {player.sumarPuntaje(10)})
+        // game.onTick(100,"actualizarpuntaje", {puntaje.puntos(player.puntaje())})
+
         game.addVisual(puntaje)
 
-        // gameMaster
+        
         gameMaster.iniciar()
 
-        // Input Handling
+      
 
         keyboard.w().onPressDo{player.mover("arriba")}
         
@@ -45,7 +46,7 @@ object shadowMantle{
         
 
         // Debug
-        game.onTick(1000, "debug2", {game.say(player, "HP: " + player.hp().toString())})
+        // game.onTick(1000, "debug2", {game.say(player, "HP: " + player.hp().toString())})
     }
 
 

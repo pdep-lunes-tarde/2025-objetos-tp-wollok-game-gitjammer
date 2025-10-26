@@ -2,57 +2,71 @@ import wollok.game.*
 
 // NOTA. TODOS LOS SPRITES SE HACEN INICIALMENTE EN 16X16, LUEGO SE REESCALAN A 200X200
 
-
+object mapa {
+    const property grilla = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+}
 class Node2D {
-    const grilla = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+    
     var property position = game.origin() // por default es el oirgen de coordenadas. ESTO SE TIENE QUE CAMBIAR SI VAMOS A HACER ENEMIGOS.
-    // Dirección
+    
     var property direccion = "abajo"
-    // Movimiento
+    
     method mover(direccionMovimiento) {
         if (direccionMovimiento == "arriba") {
-            self.position( position.up(1) )
+            position = position.up(1)
         }
         if (direccionMovimiento == "izquierda") {
-            self.position ( position.left(1) )
+            position = position.left(1) 
         }
         if (direccionMovimiento == "derecha") {
-            self.position ( position.right(1) )
+            position = position.right(1)
         }
         if (direccionMovimiento == "abajo") {
-            self.position ( position.down(1) )
+            position = position.down(1)
         }
         self.direccion(direccionMovimiento)
-        }
+    }
+
     // Daño
 }
+
+
+
 // CLASE DE CharacterBody2D. DE ESTA HEREDAN EL JUGADOR Y LOS ENEMIGOS
 class CharacterBody2D inherits Node2D{
     var property image = "goblinplaceholder.png"
-    method image() = image
-    method image(newImage) {image = newImage}
+   
     method soyElJugador() {return false}
     // Salud
     var property hp = 1
     method cambiarHP(cantidad) { hp = hp + cantidad}
 
     method morir() {
-        if (hp -1 == 0){game.removeVisual(self)}
+            game.removeVisual(self)
+            if (!self.soyElJugador()){
+                gameMaster.enemigos.remove(self)
+                puntaje.sumarPuntaje(10)
+            }else{
+                game.addVisual("¡Game Over!")
+            }
     }
+
     method tomarDaño() {
-      self.morir()
-      self.cambiarHP(-1)
+        self.cambiarHP(-1)
+        if (hp <= 0){
+            self.morir()
+        }
     }
 }
 
 // Jugador.
-object player inherits CharacterBody2D{
+object player inherits CharacterBody2D(image = "playerFront1.png"){
     override method soyElJugador() {return true}
-    // Imagen
-    override method image() = "playerFront1.png"
-    // Puntaje
-    var property puntaje = 0
-    method sumarPuntaje(cantidad) { puntaje = puntaje + cantidad} // Si quisiesemos restar puntaje al ser golpeados, deberíamos poner una cantidad negativa.
+
+    method sumarPuntaje(cantidad) { 
+        puntaje.sumarPuntaje(cantidad)
+    } 
+
     // Ataque
     method atacar() {
         const ataque = new Attack()
@@ -64,66 +78,52 @@ object player inherits CharacterBody2D{
     }
 }
 
-
 class Attack inherits Node2D{
     method image() = "ataque.png"
     var property daño = 1
     var property duracion = 500 // Duración en milisegundos
 }
+
 // Barra de puntaje
 object puntaje {
      var property position = game.at(0,14)
-     method position(nuevaPosicion) { position = nuevaPosicion}
+     
      var puntos = 0
-     method puntos(nuevoPuntaje) {
-        puntos = nuevoPuntaje
+     method puntos(nuevosPuntos){puntos = nuevosPuntos}
+
+     method sumarPuntaje(puntajeASumar) {
+        puntos = puntos + puntajeASumar
+        if (puntos < 0) {self.puntos(0)}
      }
+
      method text() = "Puntaje: " + puntos.toString()
-     method interactuar() {}
      method textColor() = "00000000"
 }
 
 // Enemigo.
-class Enemy inherits CharacterBody2D{
-    override method image() = "goblinplaceholder.png"
+class Enemy inherits CharacterBody2D(image = "goblinplaceholder.png"){
+
     method interactuar(entidad){
         if (entidad.soyElJugador()){
             entidad.tomarDaño()
             entidad.position(game.center())
             entidad.sumarPuntaje(-100)
-            if (entidad.puntaje() -100 > 0) { entidad.puntaje(0) }
         }
     }
     method serAtacado(ataque) {
       self.tomarDaño()
       gameMaster.spawnCount(gameMaster.spawnCount() - 1) // Decrementa el contador de enemigos vivos al morir uno
     }
-}
 
-class Zombie inherits Enemy{
-    override method image() = "Zombie.png"
-    var property direccionDelJugador = "abajo"
-    method obtenerDireccionDelJugador(player){
-        const diferenciaEnX = player.position().x() - self.position().x()
-        const diferenciaEnY = player.position().y() - self.position().y()
-        if (diferenciaEnX >= 0 && diferenciaEnY <= 0){ // Caso 1. Abajo a la derecha
-            if (diferenciaEnX < diferenciaEnY.abs()){ self.direccionDelJugador("abajo") }
-            else { self.direccionDelJugador("derecha")}
-        }
-        if (diferenciaEnX <= 0 && diferenciaEnY <= 0) { // Caso 2. Abajo a la izquierda
-            if (diferenciaEnX.abs() < diferenciaEnY.abs()) { self.direccionDelJugador("abajo")}
-            else { self.direccionDelJugador("izquierda")}
-        }
-        if (diferenciaEnX >= 0 && diferenciaEnY > 0){ // Caso 3. Arriba a la derecha{
-            if (diferenciaEnX < diferenciaEnY){ self.direccionDelJugador("arriba")}
-            else {self.direccionDelJugador("derecha")}
-        }
-        if (diferenciaEnX <= 0 && diferenciaEnY > 0){ // Caso 4. Arriba a la izquierda
-            if (diferenciaEnX < diferenciaEnY.abs()) { self.direccionDelJugador("arriba")}
-            else {self.direccionDelJugador("izquierda")}
-        }
-    }
     method seleccionarPosicion(rand1){
+        
+        const bordes = [ [mapa.grilla.anyOne(), 0], [mapa.grilla.anyOne(), 14], [0, mapa.grilla.anyOne()], [14, mapa.grilla.anyOne()] ]
+        const posicion = bordes[rand1 - 1]
+        const x = posicion[0]
+        const y = posicion[1]
+        self.position(game.at(x, y))
+    
+        /*
         if (rand1 == 1){ //Borde inferior
         const yCoor = 0
         const xCoor = grilla.anyOne()
@@ -144,39 +144,71 @@ class Zombie inherits Enemy{
         const xCoor = 14
         self.position(game.at(xCoor, yCoor))
         }}}}
-    }
-    method moverse(player){
-        self.obtenerDireccionDelJugador(player)
-        self.mover(direccionDelJugador)
-    }
-    method inicializar(player){
-        self.seleccionarPosicion([1,2,3,4].anyOne())
-        game.onTick(500, "moverzombie", {self.moverse(player)})
-        game.whenCollideDo(player, {otro => otro.interactuar(player)})
+        
+    */
     }
 }
-class Skeleton inherits Enemy{
-    override method image() = "Skeleton.png"
-    var property direccionDelJugador = "izquierda"
-    method obtenerDireccionDelJugador(player){
+
+class Zombie inherits Enemy(image = "Zombie.png"){
+    
+    /*
+    method obtenerDireccionDelJugador(){
+        const diferenciaEnX = player.position().x() - self.position().x()
         const diferenciaEnY = player.position().y() - self.position().y()
-        if (diferenciaEnY > 0){ self.direccionDelJugador("arriba")}
-        else { self.direccionDelJugador("abajo")}
-    }
-    method seleccionarPosicion(rand1){
-        if (rand1 == 1) //Borde Izquierdo
-        {
-            const yCoor = grilla.anyOne()
-            const xCoor = 0
-            self.position(game.at(xCoor, yCoor))
+        if (diferenciaEnX >= 0 && diferenciaEnY <= 0){ // Caso 1. Abajo a la derecha
+            if (diferenciaEnX < diferenciaEnY.abs()){ self.direccionDelJugador("abajo") }
+            else { self.direccionDelJugador("derecha")}
         }
-        else {if (rand1 == 2) //Borde Derecho
-        {
-            const yCoor = grilla.anyOne()
-            const xCoor = 14
-            self.position(game.at(xCoor, yCoor))
-        } }
+        if (diferenciaEnX <= 0 && diferenciaEnY <= 0) { // Caso 2. Abajo a la izquierda
+            if (diferenciaEnX.abs() < diferenciaEnY.abs()) { self.direccionDelJugador("abajo")}
+            else { self.direccionDelJugador("izquierda")}
+        }
+        if (diferenciaEnX >= 0 && diferenciaEnY > 0){ // Caso 3. Arriba a la derecha{
+            if (diferenciaEnX < diferenciaEnY){ self.direccionDelJugador("arriba")}
+            else {self.direccionDelJugador("derecha")}
+        }
+        if (diferenciaEnX <= 0 && diferenciaEnY > 0){ // Caso 4. Arriba a la izquierda
+            if (diferenciaEnX < diferenciaEnY.abs()) { self.direccionDelJugador("arriba")}
+            else {self.direccionDelJugador("izquierda")}
+        }
     }
+    */
+
+    method obtenerDireccionDelJugador() {
+        const diferenciaEnX = player.position().x() - self.position().x()
+        const diferenciaEnY = player.position().y() - self.position().y()
+
+        if (diferenciaEnX.abs() > diferenciaEnY.abs()) {
+            if (diferenciaEnX > 0) self.direccion("derecha") else self.direccion("izquierda")
+        } else {
+            if (diferenciaEnY > 0) self.direccion("abajo") else self.direccion("arriba")
+        }
+    }
+
+    
+    method moverse(){
+        self.obtenerDireccionDelJugador()
+        self.mover(self.direccion())
+    }
+
+    method inicializar(){
+        self.seleccionarPosicion([1,2,3,4].anyOne())
+        // game.onTick(500, "moverzombie", {self.moverse()})
+        game.addVisual(self)
+        game.whenCollideDo(self, {entidad => self.interactuar(entidad)}) // REVISAR
+    }
+}
+
+
+class Skeleton inherits Enemy(image = "Skeleton.png"){
+
+    method obtenerDireccionDelJugador(){
+        const diferenciaEnY = player.position().y() - self.position().y()
+        if (diferenciaEnY > 0){ self.direccion("arriba")}
+        else { self.direccion("abajo")}
+    }
+    
+    /*
     method dispararFlecha(){
         const flecha = new Enemy() // Iba a incluir una clase de Flecha, pero creo que es innecesario ya que hace lo mismo que un enemigo.
         const duracion = 3500 // Que es ancho de la pantalla x velocidad a la que se va a mover (cada 250 ms)
@@ -195,29 +227,34 @@ class Skeleton inherits Enemy{
         game.onCollideDo(flecha, {flecha => game.removeVisual(flecha) })
         game.schedule(duracion, {game.removeVisual(flecha)})
     }
-    method moverse(player){
+    */
+    method moverse(){
         if (self.position().y() != player.position().y()) {
-            self.obtenerDireccionDelJugador(player)
-            self.mover(direccionDelJugador)
-        } else {
-            self.dispararFlecha()
-        }
+            self.obtenerDireccionDelJugador()
+            self.mover(direccion)
+        } //else {
+            //self.dispararFlecha()
+        //}
     }
-    method inicializar(player){
+     
+    method inicializar(){
         self.seleccionarPosicion([1,2].anyOne())
-        game.onTick(500, "moveresqueleto", {self.moverse(player)})
-        game.whenCollideDo(player, {otro => otro.interactuar(player)})
+        // game.onTick(500, "moveresqueleto", {self.moverse()})
+        game.addVisual(self)
+        game.whenCollideDo(self, {entidad => self.interactuar(entidad)})
     }
+   
 }
+    
+class Goblin inherits Enemy(image = "Goblin.png", direccion = "derecha"){
 
-class Goblin inherits Enemy{
-    override method image() = "Goblin.png"
-    var property direccionDelJugador = "arriba"
-    method obtenerDireccionDelJugador(player){
+    method obtenerDireccionDelJugador(){
         const diferenciaEnX = player.position().x() - self.position().x()
-        if (diferenciaEnX >= 0){self.direccionDelJugador("derecha")}
-        else { self.direccionDelJugador("izquierda")}
+        if (diferenciaEnX >= 0){self.direccion("derecha")}
+        else { self.direccion("izquierda")}
     }
+    
+    /*
     method seleccionarPosicion(rand1){
         if (rand1 == 1) //Borde Inferior
         {
@@ -232,6 +269,9 @@ class Goblin inherits Enemy{
             self.position(game.at(xCoor, yCoor))
         } }
     }
+    */
+    
+    /*
     method dispararLanza(){
         const lanza = new Enemy()
         const duracion = 3500 // Que es alto de la pantalla x velocidad a la que se va a mover (cada 250 ms)
@@ -250,58 +290,70 @@ class Goblin inherits Enemy{
         game.onCollideDo(lanza, {lanza => game.removeVisual(lanza)})
         game.schedule(duracion, {game.removeVisual(lanza)})
     }
-    method moverse(player){
+    */
+    method moverse(){
         if (self.position().x() != player.position().x()) {
-            self.obtenerDireccionDelJugador(player)
-            self.mover(direccionDelJugador)
-        } else {
-            self.dispararLanza()
-        }
+            self.obtenerDireccionDelJugador()
+            self.mover(direccion)
+        } //else {
+            //self.dispararLanza()
+        //}
     }
-    method inicializar(player){
+    method inicializar(){
         self.seleccionarPosicion([1,2].anyOne())
-        game.onTick(500, "movergoblin", {self.moverse(player)})
-        game.whenCollideDo(player, {otro => otro.interactuar(player)})
-}}
-
+        // game.onTick(500, "movergoblin", {self.moverse()})
+        game.addVisual(self)
+        game.whenCollideDo(self, {entidad => self.interactuar(entidad)})
+    }
+    
+}
 
 
 // Juego
 object gameMaster {
     var property spawnCount = 0
+    var property enemigos = []
+
     method enemigoAleatorio() {
-       return ["zombie", "esqueleto", "goblin"].anyOne()
+       return ["zombie", "skeleton", "goblin"].anyOne()
     }
+    
     method randomSpawn(){
         const enemigoASpawnear = self.enemigoAleatorio()
+
         if (enemigoASpawnear == "zombie") {
             const zombie = new Zombie()
-            zombie.inicializar(player)
-            game.addVisual(zombie)
+
+            zombie.inicializar()
+            enemigos.add(zombie)
         }
-        else {if (enemigoASpawnear == "esqueleto") {
+        
+        else {if (enemigoASpawnear == "skeleton") {
             const skeleton = new Skeleton()
-            skeleton.inicializar(player)
-            game.addVisual(skeleton)
+            skeleton.inicializar()
+            enemigos.add(skeleton)
         }
         else { if (enemigoASpawnear == "goblin") {
             const goblin = new Goblin()
-            goblin.inicializar(player)
-            game.addVisual(goblin)
+            goblin.inicializar()
+            enemigos.add(goblin)
             } }
         }
+        
         self.spawnCount(self.spawnCount()+1)
     }
+    
     method iniciar(){
-        game.onTick(1000, "spawn", {self.randomSpawn()})
+        game.onTick(500, "moverEnemigos", {if (enemigos.size() > 0) enemigos.forEach({ e => e.moverse() }) } )
         game.onTick(1000, "revisarSpawns", {self.revisarSpawns()})
     }
+
+    method spawnear(){
+        game.onTick(1000, "spawn", {self.randomSpawn()})
+    }
+
     method revisarSpawns() {
-        if (self.spawnCount() > 5) {
-            game.removeTickEvent("spawn")
-        if (self.spawnCount() == 0){ // Esto no estaría funcionando. Revisar por qué. A lo mejor el spawnCount no se está reduciendo correctamente...
-            self.iniciar()
-        }
-        }
+        if (self.spawnCount() > 5) game.removeTickEvent("spawn")
+        if (self.spawnCount() == 0) self.spawnear()
     }
 }
