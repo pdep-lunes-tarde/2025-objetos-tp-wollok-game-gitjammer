@@ -1,7 +1,6 @@
 import shadowMantle.*
 import juegoShadowMantle.*
 
-
 test "Test de prueba" {
 	assert.equals(4, 2 + 2)
 }
@@ -27,4 +26,110 @@ test "El puntaje se aumenta al morir un enemigo" {
 	const zombie = new Zombie()
 	zombie.morir()
 	assert.equals(10, puntaje.puntos())
+}
+
+test "Al inicio del juego el puntaje es cero" {
+	shadowMantle.configuracion()
+	assert.equals(0, puntaje.puntos())
+}
+
+test "Al llegar a 0 HP, el jugador se marca como muerto" {
+	shadowMantle.configuracion()
+	
+	// Dejamos al jugador sin vida
+	player.tomarDaño()
+	player.tomarDaño()
+	player.tomarDaño()
+	
+	assert.equals(false, player.activo())
+}
+
+test "No se puede salir del mapa" {
+	shadowMantle.configuracion()
+	
+	// Posicionamos al jugador en una esquina
+	player.position(game.at(0, 0))
+	
+	// Intentamos moverlo hacia la izquierda o abajo
+	player.mover("izquierda")
+	player.mover("abajo")
+	
+	// La posición debería seguir siendo la inicial
+	assert.equals(0, player.position().x())
+	assert.equals(0, player.position().y())
+}
+
+test "Los enemigos aparecen dentro del mapa" {
+	const zombie = new Zombie()
+	zombie.seleccionarPosicion(1) // borde inferior
+	assert.equals(true, zombie.position().x() >= 0 && zombie.position().x() <= mapa.grillaMax() && zombie.position().y() >= 0 && zombie.position().y() <= mapa.grillaMax())
+}
+
+test "El jugador se mueve correctamente hacia arriba" {
+	shadowMantle.configuracion()
+	player.position(game.at(5, 5))
+
+	player.mover("arriba")
+	assert.equals(6, player.position().y()) // subió 1
+}
+
+test "El jugador se mueve correctamente hacia la derecha" {
+	shadowMantle.configuracion()
+	player.position(game.at(5, 5))
+
+	player.mover("derecha")
+	assert.equals(6, player.position().x()) // subió 1
+}
+
+test "El jugador se mueve correctamente hacia abajo" {
+	shadowMantle.configuracion()
+	player.position(game.at(5, 5))
+
+	player.mover("abajo")
+	assert.equals(4, player.position().y()) // subió 1
+}
+
+test "El jugador se mueve correctamente hacia la izquierda" {
+	shadowMantle.configuracion()
+	player.position(game.at(5, 5))
+
+	player.mover("izquierda")
+	assert.equals(4, player.position().x()) // subió 1
+}
+
+test "El jugador pierde vida al colisionar con un enemigo" {
+	shadowMantle.configuracion()
+
+	const zombie = new Zombie()
+	zombie.position(player.position())
+
+	zombie.interactuar(player)
+
+	assert.equals(2, player.hp())
+}
+
+test "El gameMaster agrega proyectiles correctamente" {
+	const flecha = new Proyectil()
+	gameMaster.agregarProyectil(flecha)
+	assert.equals(true, gameMaster.proyectiles().contains(flecha))
+}
+
+test "El gameMaster elimina proyectiles correctamente" {
+	const flecha = new Proyectil()
+	gameMaster.agregarProyectil(flecha)
+	gameMaster.eliminarProyectil(flecha)
+	assert.equals(false, gameMaster.proyectiles().contains(flecha))
+}
+
+test "El goblin dispara cuando el jugador está alineado" {
+	shadowMantle.configuracion()
+
+	const goblin = new Goblin()
+	goblin.position(game.at(5, 0))
+	player.position(game.at(5, 5))
+
+	goblin.cooldown(4)
+	goblin.moverse()
+
+	assert.equals(true, gameMaster.proyectiles().size() > 0)
 }
