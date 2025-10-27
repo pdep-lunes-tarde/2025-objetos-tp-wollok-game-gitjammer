@@ -1,5 +1,30 @@
 import shadowMantle.*
+import juegoShadowMantle.*
+
 
 test "Test de prueba" {
 	assert.equals(4, 2 + 2)
+}
+
+test "El jugador comienza con vida completa" {
+	shadowMantle.configuracion()
+	assert.equals(3, player.hp())
+}
+
+test "El jugador pierde vida correctamente" {
+	shadowMantle.configuracion()
+	player.cambiarHP(-1)
+	assert.equals(2, player.hp())
+}
+
+test "El jugador no puede tener vida negativa" {
+	shadowMantle.configuracion()
+	player.cambiarHP(-5)
+	assert.equals(0, player.hp())
+}
+
+test "El puntaje se aumenta al morir un enemigo" {
+	const zombie = new Zombie()
+	zombie.morir()
+	assert.equals(10, puntaje.puntos())
 }

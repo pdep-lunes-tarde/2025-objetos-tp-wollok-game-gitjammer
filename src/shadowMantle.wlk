@@ -35,7 +35,13 @@ class Cuerpo2D inherits Visual{
     
     // Salud
     var property hp = 1
-    method cambiarHP(cantidad) { hp = hp + cantidad}
+    method cambiarHP(cantidad) { 
+        if (hp + cantidad < 0){
+            hp = 0
+        } else {
+        hp = hp + cantidad
+        }
+        }
 
     method morir() {
             game.removeVisual(self)
