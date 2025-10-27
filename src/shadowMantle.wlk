@@ -243,10 +243,17 @@ class Enemy inherits Cuerpo2D(image = "goblinplaceholder.png"){
 
     method interactuar(entidad){
         if (self.activo() && entidad.soyElJugador()){
+            const sonidoDaño = game.sound("playerhit-43108.mp3") 
+            sonidoDaño.shouldLoop(false)
+            sonidoDaño.volume(0.5)
+            sonidoDaño.play()
             entidad.position(game.center())
             entidad.tomarDaño()
             game.say(entidad, "AU")
             
+        }
+        else {
+            return
         }
     }
     method serAtacado() {
@@ -347,6 +354,10 @@ class Skeleton inherits Enemy(image = "Skeleton.png"){
     
     
     method dispararFlecha(){
+        const sonidoDisparo = game.sound("gameboy-pluck-41265.mp3")
+        sonidoDisparo.shouldLoop(false)
+        sonidoDisparo.volume(0.1)
+        sonidoDisparo.play()
         var flecha
         if(projectilePool.objetos().size() < 2){
             flecha = new Proyectil()
@@ -415,6 +426,10 @@ class Goblin inherits Enemy(image = "Goblin.png", direccion = "derecha"){
     
        
     method dispararLanza(){
+        const sonidoDisparo = game.sound("gameboy-pluck-41265.mp3")
+        sonidoDisparo.shouldLoop(false)
+        sonidoDisparo.volume(0.1)
+        sonidoDisparo.play()
         var lanza
         if (projectilePool.objetos().size() < 2){
             lanza = new Proyectil()
