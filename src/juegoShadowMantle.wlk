@@ -4,7 +4,8 @@ import wollok.game.*
 object shadowMantle{
     // Configuración general
     const title = "Shadow Mantle"
-    const tamano = 15
+    const tamano = 25
+    
     method ancho() { return tamano }
     method alto() { return tamano }
 
@@ -12,14 +13,22 @@ object shadowMantle{
     method configuracion(){
         game.width(self.ancho())
         game.height(self.alto())
-        game.cellSize(64)
+        game.cellSize(40)
         game.title(title)
         
+        mapa.grillaMax(tamano-1)
+        game.boardGround("fondo.png")
+
+        const musica = game.sound("OcarinaOfTime.mp3")
+        musica.shouldLoop(true)
+        musica.volume(0.25)
+        game.schedule(1000, {musica.play()})
 
         // Jugador
         const maxHP = 3
         player.hp(maxHP)
         player.position(game.center())
+
         game.addVisual(player)
         game.showAttributes(player)
 
