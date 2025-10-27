@@ -99,6 +99,34 @@ object player inherits Cuerpo2D(image = "playerFront1.png"){
             game.schedule(attack.duracion(), {game.removeVisual(attack) attack.desactivar()})
         }
     }
+
+    override method mover(direccionMovimiento) {
+        var posicion = self.position()
+
+        if (direccionMovimiento == "arriba") {
+            if (posicion.y() + 1 <= mapa.grillaMax()) {
+                posicion = position.up(1)
+            }
+        }
+        else if (direccionMovimiento == "izquierda") {
+            if (posicion.x() - 1 >= 0) {
+                posicion = position.left(1)
+            }
+        } 
+        else if (direccionMovimiento == "derecha") {
+            if (posicion.x() + 1 <= mapa.grillaMax()){
+                posicion = position.right(1)
+            }
+        }
+        else if (direccionMovimiento == "abajo") {
+            if (posicion.y() - 1 >= 0) {
+                posicion = position.down(1)
+            }
+        }
+
+    self.position(posicion)
+    self.direccion(direccionMovimiento)
+    }
 }
 
 
@@ -140,6 +168,7 @@ object puntaje {
 object gameOver{
     var property position = game.origin()
     method image() = "gameOver.png"
+    method soyElJugador() = false
 }
 
 class Pool { //maximo de objetos porque el garbage collector no estaria garbage collecteando y se empieza a laggear todo
@@ -202,33 +231,6 @@ object enemyPools {
         return goblins.obtener()
     }
 
-
-    /*
-    method activarZombie(zombie){
-        zombies.activar(zombie)
-    }
-
-    method desactivarZombie(zombie){
-        zombies.desactivar(zombie)
-    }
-
-    method activarSkeleton(skeleton){
-        skeletons.activar(skeleton)
-    }
-
-    method desactivarSkeleton(skeleton){
-        skeletons.desactivar(skeleton)
-    }
-
-
-    method activarGoblin(goblin){
-        goblins.activar(goblin)
-    }
-
-    method desactivarGoblin(goblin){
-        goblins.desactivar(goblin)
-    }
-    */
 }
 
 
@@ -244,7 +246,7 @@ class Enemy inherits Cuerpo2D(image = "goblinplaceholder.png"){
             entidad.position(game.center())
             entidad.tomarDaño()
             game.say(entidad, "AU")
-            //entidad.sumarPuntaje(-100)
+            
         }
     }
     method serAtacado() {
